@@ -86,3 +86,36 @@ TEST_F(SLTest, first_index_of_ReturnsCorrectIndex) {
     SL_add(&list, str);
     ASSERT_EQ(0, SL_first_index_of(list, str)) << "SL_first_index_of is supposed to return the _first_ index of this string :/";
 }
+
+TEST_F(SLTest, sort_WorksCorrectly) {
+    SL_add(&list, str2);
+    SL_add(&list, str);
+    SL_sort(list);
+
+    ASSERT_EQ(0, strcmp(str, list[0])) << "Sorting did not work as expected";
+}
+
+TEST_F(SLTest, remove_duplicates_DoesNothingIfOneElement) {
+    SL_add(&list, str);
+    SL_remove_duplicates(&list);
+
+    ASSERT_EQ(1, SL_length(list)) << "SL_remove_duplicates removed the only element";
+}
+
+TEST_F(SLTest, remove_duplicates_DoesNotRemoveFirstOccurence) {
+    SL_add(&list, str);
+    SL_add(&list, str);
+    SL_remove_duplicates(&list);
+
+    ASSERT_EQ(1, SL_length(list)) << "SL_remove_duplicates removed both occurrences of a repeating element";
+}
+
+TEST_F(SLTest, remove_duplicates_DoesNotRemoveUniqueElements) {
+    SL_add(&list, str);
+    SL_add(&list, str);
+    SL_add(&list, str2);
+    SL_remove_duplicates(&list);
+
+    ASSERT_EQ(2, SL_length(list));
+    ASSERT_EQ(0, strcmp(str2, list[1])) << "SL_remove_duplicates removed unique element";
+}
