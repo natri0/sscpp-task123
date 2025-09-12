@@ -20,9 +20,11 @@ void SL_free(StringList sl) {
 void SL_add(StringList *sl, const char *str) {
     if (!sl || !*sl) return;
 
-    *sl = static_cast<StringList>(realloc(*sl, sizeof(char *) * (SL_length(*sl) + 2)));
-    (*sl)[SL_length(*sl)] = strdup(str);
-    (*sl)[SL_length(*sl) + 1] = nullptr;
+    unsigned int list_len = SL_length(*sl);
+
+    *sl = static_cast<StringList>(realloc(*sl, sizeof(char *) * (list_len + 2)));
+    (*sl)[list_len] = strdup(str);
+    (*sl)[list_len + 1] = nullptr;
 }
 
 void SL_remove(StringList *sl, const char *str) {
@@ -32,13 +34,16 @@ void SL_remove(StringList *sl, const char *str) {
     auto *new_sl = static_cast<StringList>(malloc(sizeof(char *) * new_len));
 
     for (unsigned int read_pos = 0, write_pos = 0; read_pos < SL_length(*sl); read_pos++) {
-        if (strcmp(str, *sl[read_pos]) == 0)
-            free(*sl[read_pos]);
+        if (strcmp(str, (*sl)[read_pos]) == 0) {
+            free((*sl)[read_pos]);
+            continue;
+        }
 
-        new_sl[write_pos] = *sl[read_pos];
+        new_sl[write_pos] = (*sl)[read_pos];
         write_pos++;
     }
 
+    new_sl[new_len - 1] = nullptr;
     *sl = new_sl;
 }
 
