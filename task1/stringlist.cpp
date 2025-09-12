@@ -103,3 +103,21 @@ void SL_remove_duplicates(StringList *sl) {
 
     *sl = new_sl;
 }
+
+void SL_replace_in_all(StringList sl, const char *to_replace, const char *replace_with) {
+    if (!sl || !*sl) return;
+
+    for (unsigned int i = 0; i < SL_length(sl); i++) {
+        char *str = sl[i];
+        char *occurrence = strstr(str, to_replace);
+        if (occurrence == nullptr) continue;
+        unsigned int occurrence_idx = occurrence - str;
+
+        sl[i] = static_cast<char *>(malloc(strlen(str) - strlen(to_replace) + strlen(replace_with) + 1));
+        memcpy(sl[i], str, occurrence_idx);
+        memcpy(sl[i] + occurrence_idx, replace_with, strlen(replace_with));
+        strcpy(sl[i] + occurrence_idx + strlen(replace_with), str + occurrence_idx + strlen(to_replace));
+
+        free(str);
+    }
+}

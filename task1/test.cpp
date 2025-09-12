@@ -119,3 +119,13 @@ TEST_F(SLTest, remove_duplicates_DoesNotRemoveUniqueElements) {
     ASSERT_EQ(2, SL_length(list));
     ASSERT_EQ(0, strcmp(str2, list[1])) << "SL_remove_duplicates removed unique element";
 }
+
+TEST_F(SLTest, replace_in_all_ReplacesCorrectly) {
+    SL_add(&list, str);
+
+    SL_replace_in_all(list, " ", ",");
+    ASSERT_EQ(0, strcmp("Hello,World", list[0])) << "SL_replace_in_all did not replace";
+
+    SL_replace_in_all(list, "!", ",");
+    ASSERT_EQ(0, strcmp("Hello,World", list[0])) << "SL_replace_in_all replaced too much";
+}
