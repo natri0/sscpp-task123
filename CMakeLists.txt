@@ -13,3 +13,7 @@ add_library(task1 STATIC
 add_executable(task1_test task1/test.cpp)
 target_link_libraries(task1_test PRIVATE task1 GTest::gtest_main)
 gtest_discover_tests(task1_test)
+
+add_executable(task2
+        task2/anytype.h
+        task2/main.cpp)
