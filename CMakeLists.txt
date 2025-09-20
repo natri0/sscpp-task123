@@ -17,3 +17,7 @@ gtest_discover_tests(task1_test)
 add_executable(task2
         task2/anytype.h
         task2/main.cpp)
+
+add_executable(task2_test task2/test.cpp)
+target_link_libraries(task2_test PRIVATE GTest::gtest_main)
+gtest_discover_tests(task2_test)
