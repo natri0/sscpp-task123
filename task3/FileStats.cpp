@@ -14,15 +14,6 @@ FileStats get_file_stats(const std::filesystem::path &path) {
     char buffer[BUFFER_SIZE];
 
     /*
-     * `total_lines`: ez, count of '\n' + 1
-     * `blank_lines`: if (this char == '\n' && prev char == '\n') count++
-     * `comment_lines`:
-     *     if (chars[start of line ... end of line] includes "//") count++
-     *     if (start of "//" != start of line) code_lines++
-     * `code_lines`: if (not comment && not blank) code_lines++
-     */
-
-    /*
      * NEW_LINE: the last line has ended in the previous fgets call, this is a new one
      * BLANK: this is the continuation of the previous fgets call (not a new line), all content since the last NEW_LINE was whitespace
      * COMMENT_SINGLE_LINE: this is not a new line, some previous fgets call gave us a '//' => all content after it is comment
@@ -49,7 +40,16 @@ FileStats get_file_stats(const std::filesystem::path &path) {
         else if (next_line_status == NORMAL || next_line_status == NEW_LINE) {
             next_line_status = NORMAL;
             if (is_blank) next_line_status = BLANK;
-            if (strstr(buffer, "//")) next_line_status = COMMENT_SINGLE_LINE;
+            if (char *comment_start = strstr(buffer, "//")) {
+                // check if there's an opening quote before the //
+                int quotes_count = 0;
+                for (char *cur = comment_start; cur >= buffer; cur--)
+                    if (*cur == '"') quotes_count++;
+
+                // if the quotes count is even, all the quotes are matched with another one => this *is* a comment
+                // if the quotes count is odd, there's probably an opening quote before the "comment" so it isn't a comment after all
+                if (quotes_count % 2 == 0) next_line_status = COMMENT_SINGLE_LINE;
+            }
         }
 
         if (strchr(buffer, '\n')) {
