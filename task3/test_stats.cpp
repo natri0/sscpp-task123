@@ -53,3 +53,17 @@ TEST_F(FileStatsTest, CountsMultipleLinesCorrectly) {
     EXPECT_EQ(1, stats.code_lines);
     EXPECT_EQ(1, stats.blank_lines);
 }
+
+TEST_F(FileStatsTest, HandlesQuotesNearCommentCorrectly) {
+    fill_stats(strdup("\"// test\n"));
+    EXPECT_EQ(0, stats.comment_lines);
+
+    fill_stats(strdup("\"\"// test\n"));
+    EXPECT_EQ(1, stats.comment_lines);
+
+    fill_stats(strdup("\"\\\"\"// test\n")); // "\""// test
+    EXPECT_EQ(1, stats.comment_lines);
+
+    fill_stats(strdup("'\"'// test\n"));
+    EXPECT_EQ(1, stats.comment_lines);
+}
