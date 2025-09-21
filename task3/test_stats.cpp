@@ -67,3 +67,11 @@ TEST_F(FileStatsTest, HandlesQuotesNearCommentCorrectly) {
     fill_stats(strdup("'\"'// test\n"));
     EXPECT_EQ(1, stats.comment_lines);
 }
+
+TEST_F(FileStatsTest, ForFile_ReturnsInvalidOnBadFile) {
+    ASSERT_EQ(false, get_file_stats({}).is_valid);
+}
+
+TEST_F(FileStatsTest, ForFile_ReturnsValidOnGoodFile) {
+    ASSERT_EQ(true, get_file_stats("task3/FileFinder.cpp").is_valid);
+}
