@@ -4,9 +4,10 @@
 #include "gets_string.h"
 
 struct FileStatsTest : testing::Test {
-    FileStats stats { std::filesystem::path {}, true, 0, 0, 0, 0 };
+    FileStats stats;
 
     void fill_stats(char *str) {
+        stats = { std::filesystem::path {}, true, 0, 0, 0, 0 };
         fill_stats_with_fn(stats, reinterpret_cast<GetLineFn>(get_line_from_string), reinterpret_cast<IsEofFn>(string_ptr_is_eof), &str);
     }
 };
