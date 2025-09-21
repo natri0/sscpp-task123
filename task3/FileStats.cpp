@@ -24,6 +24,13 @@ FileStats get_file_stats(const std::filesystem::path &path) {
     FILE *fp = fopen(path.string().c_str(), "r");
     if (!fp) return FileStats::invalid(path);
 
+    fill_stats_with_fn(stats, reinterpret_cast<GetLineFn>(fgets), reinterpret_cast<IsEofFn>(feof), fp);
+
+    fclose(fp);
+    return stats;
+}
+
+void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *fp) {
     char buffer[BUFFER_SIZE];
 
     /*
@@ -83,7 +90,4 @@ FileStats get_file_stats(const std::filesystem::path &path) {
                 next_line_status = NEW_LINE;
         }
     }
-
-    fclose(fp);
-    return stats;
 }
