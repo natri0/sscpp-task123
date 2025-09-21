@@ -25,8 +25,8 @@ gtest_discover_tests(task2_test)
 add_library(task3_lib STATIC
         task3/FileFinder.cpp
         task3/FileFinder.h
-        task3/filestats.cpp
-        task3/filestats.h)
+        task3/FileStats.cpp
+        task3/FileStats.h)
 
 add_executable(task3 task3/task3.cpp)
 target_link_libraries(task3 PRIVATE task3_lib)

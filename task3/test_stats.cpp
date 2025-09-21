@@ -3,8 +3,6 @@
 #include "FileStats.h"
 #include "gets_string.h"
 
-#define FILL_STATS 
-
 struct FileStatsTest : testing::Test {
     FileStats stats { std::filesystem::path {}, true, 0, 0, 0, 0 };
 

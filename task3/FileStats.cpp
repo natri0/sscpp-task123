@@ -38,6 +38,7 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
      * BLANK: this is the continuation of the previous fgets call (not a new line), all content since the last NEW_LINE was whitespace
      * COMMENT_SINGLE_LINE: this is not a new line, some previous fgets call gave us a '//' => all content after it is comment
      * NORMAL: this is a continuation of a normal line (i.e. not blank or comment), haven't seen a \n yet
+     * NORMAL_AFTER_COMMENT: quick hack to not count NORMAL lines after COMMENT_BLOCK twice
      */
 
     enum {
@@ -46,6 +47,7 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
         COMMENT_SINGLE_LINE,
         COMMENT_BLOCK,
         NORMAL,
+        NORMAL_AFTER_BLOCK_COMMENT,
     } next_line_status = NEW_LINE;
     while (!feof(fp)) {
         fgets(buffer, BUFFER_SIZE, fp);
@@ -74,7 +76,7 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
 
         if (next_line_status == COMMENT_BLOCK && strstr(buffer, "*/")) {
             stats.comment_lines++; // increment it here so that the */ line does get counted
-            next_line_status = NORMAL;
+            next_line_status = NORMAL_AFTER_BLOCK_COMMENT;
         }
 
         if (strchr(buffer, '\n')) {
@@ -89,5 +91,9 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
             if (next_line_status != COMMENT_BLOCK)
                 next_line_status = NEW_LINE;
         }
+    }
+
+    if (stats.total_lines == 0) {
+        stats.blank_lines = stats.total_lines = 1;
     }
 }
