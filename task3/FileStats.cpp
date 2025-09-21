@@ -44,19 +44,12 @@ FileStats get_file_stats(const std::filesystem::path &path) {
             if (!isspace(buffer[i])) is_blank = false;
         }
 
-        switch (next_line_status) {
-            case BLANK: {
-                if (!is_blank) next_line_status = NORMAL;
-            }; break;
-            case COMMENT_SINGLE_LINE: {
-
-            }; break;
-            case NORMAL:
-            case NEW_LINE: {
-                next_line_status = NORMAL;
-                if (is_blank) next_line_status = BLANK;
-                if (strstr(buffer, "//")) next_line_status = COMMENT_SINGLE_LINE;
-            }; break;
+        if (next_line_status == BLANK && !is_blank)
+            next_line_status = NORMAL;
+        else if (next_line_status == NORMAL || next_line_status == NEW_LINE) {
+            next_line_status = NORMAL;
+            if (is_blank) next_line_status = BLANK;
+            if (strstr(buffer, "//")) next_line_status = COMMENT_SINGLE_LINE;
         }
 
         if (strchr(buffer, '\n')) {
