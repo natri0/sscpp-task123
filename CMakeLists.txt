@@ -21,3 +21,8 @@ add_executable(task2
 add_executable(task2_test task2/test.cpp)
 target_link_libraries(task2_test PRIVATE GTest::gtest_main)
 gtest_discover_tests(task2_test)
+
+add_executable(task3
+        task3/task3.cpp
+        task3/FileFinder.cpp
+        task3/FileFinder.h)
