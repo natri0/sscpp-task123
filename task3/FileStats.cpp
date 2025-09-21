@@ -4,6 +4,19 @@
 
 constexpr unsigned int BUFFER_SIZE = 1024;
 
+static int get_quotes_count(const char *start, const char *end) {
+    int quotes_count = 0;
+    for (const char *cur = end; cur >= start; cur--)
+        if (*cur == '"') {
+            bool is_literal_start_or_end = true;
+            if (cur > start && cur[-1] == '\\') is_literal_start_or_end = false;
+            if (cur > start && cur[-1] == '\'' && cur[1] == '\'') is_literal_start_or_end = false;
+
+            if (is_literal_start_or_end) quotes_count++;
+        }
+    return quotes_count;
+}
+
 FileStats get_file_stats(const std::filesystem::path &path) {
     if (!is_regular_file(path)) return FileStats::invalid(path);
     FileStats stats = FileStats::valid(path);
@@ -24,6 +37,7 @@ FileStats get_file_stats(const std::filesystem::path &path) {
         NEW_LINE,
         BLANK,
         COMMENT_SINGLE_LINE,
+        COMMENT_BLOCK,
         NORMAL,
     } next_line_status = NEW_LINE;
     while (!feof(fp)) {
@@ -41,33 +55,32 @@ FileStats get_file_stats(const std::filesystem::path &path) {
             next_line_status = NORMAL;
             if (is_blank) next_line_status = BLANK;
             if (char *comment_start = strstr(buffer, "//")) {
-                // check if there's an opening quote before the //
-                int quotes_count = 0;
-                for (char *cur = comment_start; cur >= buffer; cur--)
-                    if (*cur == '"') {
-                        bool is_literal_start_or_end = true;
-                        if (cur > buffer && cur[-1] == '\\') is_literal_start_or_end = false;
-                        if (cur > buffer && cur[-1] == '\'' && cur[1] == '\'') is_literal_start_or_end = false;
-
-                        if (is_literal_start_or_end) quotes_count++;
-                    }
-
+                // check if there's an opening quote before the //:
                 // if the quotes count is even, all the quotes are matched with another one => this *is* a comment
                 // if the quotes count is odd, there's probably an opening quote before the "comment" so it isn't a comment after all
-                if (quotes_count % 2 == 0) next_line_status = COMMENT_SINGLE_LINE;
+                if (get_quotes_count(buffer, comment_start) % 2 == 0) next_line_status = COMMENT_SINGLE_LINE;
             }
+            if (char *comment_start = strstr(buffer, "/*")) {
+                if (get_quotes_count(buffer, comment_start) % 2 == 0) next_line_status = COMMENT_BLOCK;
+            }
+        }
+
+        if (next_line_status == COMMENT_BLOCK && strstr(buffer, "*/")) {
+            stats.comment_lines++; // increment it here so that the */ line does get counted
+            next_line_status = NORMAL;
         }
 
         if (strchr(buffer, '\n')) {
             if (next_line_status == BLANK)
                 stats.blank_lines++;
-            if (next_line_status == COMMENT_SINGLE_LINE)
+            if (next_line_status == COMMENT_SINGLE_LINE || next_line_status == COMMENT_BLOCK)
                 stats.comment_lines++;
             if (next_line_status == NORMAL)
                 stats.code_lines++;
             stats.total_lines++;
 
-            next_line_status = NEW_LINE;
+            if (next_line_status != COMMENT_BLOCK)
+                next_line_status = NEW_LINE;
         }
     }
 
