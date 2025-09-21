@@ -44,7 +44,13 @@ FileStats get_file_stats(const std::filesystem::path &path) {
                 // check if there's an opening quote before the //
                 int quotes_count = 0;
                 for (char *cur = comment_start; cur >= buffer; cur--)
-                    if (*cur == '"') quotes_count++;
+                    if (*cur == '"') {
+                        bool is_literal_start_or_end = true;
+                        if (cur > buffer && cur[-1] == '\\') is_literal_start_or_end = false;
+                        if (cur > buffer && cur[-1] == '\'' && cur[1] == '\'') is_literal_start_or_end = false;
+
+                        if (is_literal_start_or_end) quotes_count++;
+                    }
 
                 // if the quotes count is even, all the quotes are matched with another one => this *is* a comment
                 // if the quotes count is odd, there's probably an opening quote before the "comment" so it isn't a comment after all
