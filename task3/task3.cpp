@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
         std::cout << "found path: " << path << std::endl;
 
         auto stats = get_file_stats(path);
-        std::cout << "lines: " << stats.total_lines << std::endl;
+        std::cout << "lines: " << stats.total_lines << ", comment: " << stats.comment_lines << ", blank: " << stats.blank_lines << ", code: " << stats.code_lines << std::endl;
         all_files.total_lines += stats.total_lines;
     }
 
