@@ -2,9 +2,9 @@
 #include <iostream>
 #include <format>
 #include <unordered_set>
-#include <vector>
 
 #include "FileFinder.h"
+#include "FileStats.h"
 
 namespace fs = std::filesystem;
 
@@ -27,7 +27,15 @@ int main(int argc, char const *argv[]) {
     FileFinder files;
     files.basedir = project_root;
 
+    FileStats all_files;
+
     for (auto path : files) {
         std::cout << "found path: " << path << std::endl;
+
+        auto stats = get_file_stats(path);
+        std::cout << "lines: " << stats.total_lines << std::endl;
+        all_files.total_lines += stats.total_lines;
     }
+
+    std::cout << "total lines for all files: " << all_files.total_lines << std::endl;
 }
