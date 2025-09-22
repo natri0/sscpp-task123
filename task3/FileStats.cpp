@@ -24,14 +24,15 @@ FileStats get_file_stats(const std::filesystem::path &path) {
     FILE *fp = fopen(path.string().c_str(), "r");
     if (!fp) return FileStats::invalid(path);
 
-    fill_stats_with_fn(stats, reinterpret_cast<GetLineFn>(fgets), reinterpret_cast<IsEofFn>(feof), fp);
+    fill_stats_with_fn(stats, reinterpret_cast<GetLineFn>(getline), reinterpret_cast<IsEofFn>(feof), fp);
 
     fclose(fp);
     return stats;
 }
 
-void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *fp) {
-    char buffer[BUFFER_SIZE];
+void fill_stats_with_fn(FileStats &stats, GetLineFn getline, IsEofFn feof, void *fp) {
+    char *buffer = nullptr;
+    size_t buffer_size;
 
     /*
      * NEW_LINE: the last line has ended in the previous fgets call, this is a new one
@@ -50,13 +51,15 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
         NORMAL_AFTER_BLOCK_COMMENT,
     } next_line_status = NEW_LINE;
     while (!feof(fp)) {
-        fgets(buffer, BUFFER_SIZE, fp);
+        getline(&buffer, &buffer_size, fp);
         size_t len = strlen(buffer);
 
         bool is_blank = true;
         for (size_t i = 0; is_blank && i < len; i++) {
             if (!isspace(buffer[i])) is_blank = false;
         }
+
+        printf("b:%hhd sz:%lu l:'%s'\n", is_blank, len, buffer);
 
         if (next_line_status == BLANK && !is_blank)
             next_line_status = NORMAL;
@@ -93,6 +96,7 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn fgets, IsEofFn feof, void *f
         }
     }
 
+    free(buffer);
     if (stats.total_lines == 0) {
         stats.blank_lines = stats.total_lines = 1;
     }

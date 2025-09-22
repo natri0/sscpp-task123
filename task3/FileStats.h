@@ -22,7 +22,7 @@ struct FileStats {
     }
 };
 
-using GetLineFn = char *(*)(char *buffer, int buffer_size, void *stream);
+using GetLineFn = char *(*)(char **buffer, size_t *buffer_size, void *stream);
 using IsEofFn = bool(*)(void *stream);
 
 FileStats get_file_stats(const std::filesystem::path& path);

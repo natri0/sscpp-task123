@@ -1,4 +1,6 @@
 #pragma once
 
-char *get_line_from_string(char *buffer, int buffer_size, char **string);
+#include <cstddef>
+
+size_t get_line_from_string(char **buffer, int *buffer_size, char **string);
 bool string_ptr_is_eof(const char **string);

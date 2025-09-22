@@ -15,8 +15,9 @@ struct FileStatsTest : testing::Test {
 TEST(GetsStringTest, gets_string_ReturnsUntilEndOfLine) {
     char *multiline_string = strdup("This is a\ntest string");
 
-    char buffer[100];
-    get_line_from_string(buffer, 100, &multiline_string);
+    char *buffer;
+    int buffer_size;
+    get_line_from_string(&buffer, &buffer_size, &multiline_string);
     ASSERT_EQ(0, strcmp(buffer, "This is a\n"));
 }
 
@@ -66,6 +67,28 @@ TEST_F(FileStatsTest, HandlesQuotesNearCommentCorrectly) {
 
     fill_stats(strdup("'\"'// test\n"));
     EXPECT_EQ(1, stats.comment_lines);
+}
+
+TEST_F(FileStatsTest, HandlesLongBlankLinesCorrectly) {
+    char buffer[10000];
+    memset(buffer, ' ', 9998);
+    buffer[9998] = '\n';
+    buffer[9999] = '\0';
+
+    fill_stats(buffer);
+    EXPECT_EQ(1, stats.blank_lines);
+}
+
+TEST_F(FileStatsTest, HandlesLongAlmostBlankLinesCorrectly) {
+    char buffer[10000];
+    memset(buffer, ' ', 9997);
+    buffer[9997] = 'a';
+    buffer[9998] = '\n';
+    buffer[9999] = '\0';
+
+    fill_stats(buffer);
+    EXPECT_EQ(0, stats.blank_lines);
+    EXPECT_EQ(1, stats.code_lines);
 }
 
 TEST_F(FileStatsTest, ForFile_ReturnsInvalidOnBadFile) {
