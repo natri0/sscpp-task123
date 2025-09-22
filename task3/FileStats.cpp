@@ -61,9 +61,7 @@ void fill_stats_with_fn(FileStats &stats, GetLineFn getline, IsEofFn feof, void 
 
         printf("b:%hhd sz:%lu l:'%s'\n", is_blank, len, buffer);
 
-        if (next_line_status == BLANK && !is_blank)
-            next_line_status = NORMAL;
-        else if (next_line_status == NORMAL || next_line_status == NEW_LINE) {
+        if (next_line_status == NORMAL || next_line_status == NEW_LINE) {
             next_line_status = NORMAL;
             if (is_blank) next_line_status = BLANK;
             if (char *comment_start = strstr(buffer, "//")) {
