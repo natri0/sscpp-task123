@@ -38,4 +38,4 @@ this one is written in a much more OOP style, having e.g. a separate class for f
 
 the most interesting code (at least if you ask me) is in [`FileStats.cpp`](task3/FileStats.cpp), as that's the file that actually calculates the statistics. when handling comments, it intelligently checks if the comment might be inside a string literal to not have false positives!
 
-at the time of writing, the multi-threading portion of it isn't done yet. we'll see.
+multi-threading is done with a thread pool to which you can submit `std::filesystem::path`s to be processed. the implementation lives in [`MT.cpp`](task3/MT.cpp).

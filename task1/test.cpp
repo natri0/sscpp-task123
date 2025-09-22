@@ -88,8 +88,8 @@ TEST_F(SLTest, first_index_of_ReturnsCorrectIndex) {
 }
 
 TEST_F(SLTest, sort_WorksCorrectly) {
-    SL_add(&list, str2);
     SL_add(&list, str);
+    SL_add(&list, str2);
     SL_sort(list);
 
     ASSERT_EQ(0, strcmp(str, list[0])) << "Sorting did not work as expected";

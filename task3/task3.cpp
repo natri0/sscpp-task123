@@ -5,6 +5,7 @@
 
 #include "FileFinder.h"
 #include "FileStats.h"
+#include "MT.h"
 
 namespace fs = std::filesystem;
 
@@ -27,15 +28,12 @@ int main(int argc, char const *argv[]) {
     FileFinder files;
     files.basedir = project_root;
 
-    FileStats all_files;
+    ThreadPool tp(16);
 
-    for (auto path : files) {
-        std::cout << "found path: " << path << std::endl;
+    for (auto path : files) tp.enqueue_file(path);
 
-        auto stats = get_file_stats(path);
-        std::cout << "lines: " << stats.total_lines << ", comment: " << stats.comment_lines << ", blank: " << stats.blank_lines << ", code: " << stats.code_lines << std::endl;
-        all_files.total_lines += stats.total_lines;
-    }
+    tp.wait_for_all();
+    FileStats all_files = tp.get_total();
 
     std::cout << "total lines for all files: " << all_files.total_lines << std::endl;
 }
