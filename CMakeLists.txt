@@ -3,6 +3,11 @@ project(task1_3)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(APPLE)
+    # macOS Clang doesn't support std::jthread without this flag :/
+    set(CMAKE_CXX_FLAGS "-fexperimental-library ${CMAKE_CXX_FLAGS}")
+endif()
+
 find_package(GTest REQUIRED)
 enable_testing()
 
@@ -26,7 +31,9 @@ add_library(task3_lib STATIC
         task3/FileFinder.cpp
         task3/FileFinder.h
         task3/FileStats.cpp
-        task3/FileStats.h)
+        task3/FileStats.h
+        task3/MT.cpp
+        task3/MT.h)
 
 add_executable(task3 task3/task3.cpp)
 target_link_libraries(task3 PRIVATE task3_lib)
