@@ -32,4 +32,10 @@ there's also a leftover [`main.cpp`](task2/main.cpp) that's used to quickly veri
 
 ## Task 3
 
-not done yet :p
+counts lines of code, blanks, comments in a given directory. there's a separate `task3` binary and a `task3_test` binary, where the former is the one you actually want to run, and the latter runs the unit tests.
+
+this one is written in a much more OOP style, having e.g. a separate class for finding files using `recursive_directory_iterator`.
+
+the most interesting code (at least if you ask me) is in [`FileStats.cpp`](task3/FileStats.cpp), as that's the file that actually calculates the statistics. when handling comments, it intelligently checks if the comment might be inside a string literal to not have false positives!
+
+at the time of writing, the multi-threading portion of it isn't done yet. we'll see.
